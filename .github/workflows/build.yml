@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4  # 更新到 v4 版本，解决 Node.js 版本警告
 
     - name: Select Xcode 13
       run: |

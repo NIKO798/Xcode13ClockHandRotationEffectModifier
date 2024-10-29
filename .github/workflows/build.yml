@@ -1,16 +1,16 @@
 name: Build Framework
 
 on:
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
   build:
-    runs-on: macos-12  # macOS Monterey，支持 Xcode 13
+    runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Select Xcode 13
       run: |
@@ -42,7 +42,7 @@ jobs:
           -output build/WidgetClockHandRotationEffect.xcframework
 
     - name: Upload Framework
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: WidgetClockHandRotationEffect
         path: build/WidgetClockHandRotationEffect.xcframework

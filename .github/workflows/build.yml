@@ -1,0 +1,48 @@
+name: Build Framework
+
+on:
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-12  # macOS Monterey，支持 Xcode 13
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Select Xcode 13
+      run: |
+        sudo xcode-select -s /Applications/Xcode_13.4.1.app
+
+    - name: Build Framework
+      run: |
+        xcodebuild archive \
+          -scheme WidgetClockHandRotationEffect \
+          -destination "generic/platform=iOS" \
+          -archivePath "build/ios.xcarchive" \
+          SKIP_INSTALL=NO \
+          BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+
+        xcodebuild archive \
+          -scheme WidgetClockHandRotationEffect \
+          -destination "generic/platform=iOS Simulator" \
+          -archivePath "build/ios-simulator.xcarchive" \
+          SKIP_INSTALL=NO \
+          BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+
+    - name: Create XCFramework
+      run: |
+        xcodebuild -create-xcframework \
+          -framework build/ios.xcarchive/Products/Library/Frameworks/WidgetClockHandRotationEffect.framework \
+          -debug-symbols "$(pwd)/build/ios.xcarchive/dSYMs/WidgetClockHandRotationEffect.framework.dSYM" \
+          -framework build/ios-simulator.xcarchive/Products/Library/Frameworks/WidgetClockHandRotationEffect.framework \
+          -debug-symbols "$(pwd)/build/ios-simulator.xcarchive/dSYMs/WidgetClockHandRotationEffect.framework.dSYM" \
+          -output build/WidgetClockHandRotationEffect.xcframework
+
+    - name: Upload Framework
+      uses: actions/upload-artifact@v2
+      with:
+        name: WidgetClockHandRotationEffect
+        path: build/WidgetClockHandRotationEffect.xcframework
